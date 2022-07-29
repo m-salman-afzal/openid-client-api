@@ -1,24 +1,18 @@
-import { ClientMetadata } from "oidc-provider";
+import {generators} from "openid-client";
 import path from "path";
 
 import Config from "../../Infrastructure/Config";
 
-const {oauth} = Config;
+const {storagePath} = Config;
 
-const STORAGE_PATH = {
-    JWKS_KEYS: path.resolve(__dirname, "../../../")
-};
+const STORAGE_PATH = {};
 
-const TEST_PROJECT: ClientMetadata[] = [{
-    client_id: oauth.TEST_CLIENT_ID,
-    redirect_uris: oauth.TEST_REDIRECT_URI.split(" "), // using jwt.io as redirect_uri to show the ID Token contents
-    response_types: ["code"],
-    grant_types: ["authorization_code"],
-    client_secret: oauth.TEST_CLIENT_SECRET,
-    token_endpoint_auth_method: "none"
-}];
+const CODE_VERIFIER = generators.codeVerifier();
+
+const CODE_CHALLENGE = generators.codeChallenge(CODE_VERIFIER);
 
 export default {
     STORAGE_PATH,
-    TEST_PROJECT
+    CODE_VERIFIER,
+    CODE_CHALLENGE
 };

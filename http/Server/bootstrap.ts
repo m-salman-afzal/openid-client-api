@@ -1,66 +1,15 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
-import path from "path";
-import {Provider, Configuration} from "oidc-provider";
 import morgan from "morgan";
-
-import TypeORMAdapter from "../../src/Infrastructure/MysqlRepository/TypeORMAdapter";
-import UsersRepository from "../../src/Infrastructure/MysqlRepository/UsersRepository";
+import session from "express-session";
+import passport from "passport";
+import {Issuer, Strategy} from "openid-client";
 
 import Config from "../../src/Infrastructure/Config";
-import Constants from "../../src/Application/Utils/Constants";
 
-const {STORAGE_PATH} = Constants;
-const {server, oauth} = Config;
-
-const jwks = JSON.parse(fs.readFileSync(`${STORAGE_PATH.JWKS_KEYS}/jwks.json`, {encoding: "utf-8"}));
-
-const configuration: Configuration = {
-    adapter: TypeORMAdapter,
-    clients: [
-        {
-            client_id: oauth.TEST_CLIENT_ID,
-            redirect_uris: oauth.TEST_REDIRECT_URI.split(" "),
-            response_types: ["code"],
-            grant_types: ["authorization_code"],
-            client_secret: oauth.TEST_CLIENT_SECRET,
-            token_endpoint_auth_method: "client_secret_basic"
-        }
-    ],
-    cookies: {
-        keys: oauth.SECURE_KEY.split(" ")
-    },
-    jwks,
-    findAccount: UsersRepository.findAccount,
-    claims: {
-        openid: ["sub"],
-        email: ["email", "email_verified"]
-    },
-    interactions: {
-        url(ctx, interaction) {
-            return `/interaction/${interaction.uid}`;
-        }
-    },
-    features: {
-        devInteractions: {enabled: false}
-    },
-    pkce: {
-        required: (ctx, client) => {
-            return true;
-        },
-        methods: ["S256"]
-    }
-};
-
-const oidc = new Provider(server.APP_URL, configuration);
-oidc.proxy = true;
+const {oauth} = Config;
 
 const bootstrap = express();
-
-bootstrap.set("trust proxy", true);
-bootstrap.set("view engine", "ejs");
-bootstrap.set("views", path.resolve(__dirname, "../../views"));
 
 const limit = {
     limit: "50mb",
@@ -70,7 +19,48 @@ const limit = {
 bootstrap.use(express.json(limit));
 bootstrap.use(express.urlencoded(limit));
 bootstrap.use(cors());
-
 bootstrap.use(morgan("dev"));
+// bootstrap.use(session({secret: "secret", resave: false, saveUninitialized: true}));
 
-export default {bootstrap, oidc};
+// bootstrap.use(passport.initialize());
+// bootstrap.use(passport.session());
+
+// passport.serializeUser((user, done) => {
+//     console.log("-----------------------------");
+//     console.log("serialize user");
+//     console.log(user);
+//     console.log("-----------------------------");
+//     done(null, user);
+// });
+
+// passport.deserializeUser((user, done) => {
+//     console.log("-----------------------------");
+//     console.log("deserialize user");
+//     console.log(user);
+//     console.log("-----------------------------");
+//     done(null, user);
+// });
+
+// Issuer.discover("http://localhost:3000/").then(oidc => {
+//     const client = new oidc.Client({
+//         client_id: oauth.CLIENT_ID,
+//         client_secret: oauth.CLIENT_SECRET,
+//         redirect_uris: ["http://localhost:8080/user"],
+//         response_types: ["code"],
+//         grant_types: ["authorization_code"],
+//         token_endpoint_auth_method: "client_secret_basic"
+//     });
+
+//     passport.use(
+//         "oidc",
+//         new Strategy({client, passReqToCallback: true}, (request, tokenSet, userinfo, done) => {
+//             console.log("tokenSet", tokenSet);
+//             console.log("userinfo", userinfo);
+//             // request.session.tokenSet = tokenSet;
+//             // request.session.userinfo = userinfo;
+//             return done(null, tokenSet);
+//         })
+//     );
+// });
+
+export default bootstrap;

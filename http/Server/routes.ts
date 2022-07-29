@@ -1,7 +1,9 @@
 import app from "./bootstrap";
 
-import interactionRoutes from "../Routes/InteractionRoutes";
+import loginRoutes from "../Routes/LoginRoutes";
+import userRoutes from "../Routes/UserRoutes";
+import clientRoutes from "../Routes/ClientRoutes";
 
-app.bootstrap.use("/interaction", interactionRoutes);
-
-app.bootstrap.use(app.oidc.callback());
+app.use("/auth", loginRoutes);
+app.use("/user", userRoutes);
+app.use("/client", clientRoutes);

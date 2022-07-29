@@ -3,7 +3,7 @@ import path from "path";
 
 import server from "./server";
 import oauth from "./oauth";
-import database from "./database"
+import database from "./database";
 
 dotenv.config();
 

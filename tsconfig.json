@@ -13,7 +13,7 @@
         "sourceMap": true,
         "skipLibCheck": true,
         "allowJs": true,
-        "esModuleInterop": true       
+        "esModuleInterop": true   
     },
     "include": ["**/*"],
     "exclude": ["node_modules", "build"]
