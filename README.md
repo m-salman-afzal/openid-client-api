@@ -1,2 +1,2 @@
-# openId-client-api
-Implementation of panva/node-openid-client
+# oauth2-server
+Manual OAuth 2.0 Server

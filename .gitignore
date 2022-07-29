@@ -1,0 +1,16 @@
+# Editor
+/.idea
+/.vscode
+
+# Project
+.env
+/build
+/node_modules
+package-lock.json
+storage
+
+# Keys
+jwks.json
+
+# Misc
+.nvmrc
